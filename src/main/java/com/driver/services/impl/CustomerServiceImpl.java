@@ -55,9 +55,12 @@ public class CustomerServiceImpl implements CustomerService {
 				bookedTrip.setStatus(TripStatus.CONFIRMED);
 				tripBookingRepository2.save(bookedTrip);
 				List<TripBooking> tripBookingList=driver.getTripBookingList();
+				if(tripBookingList==null)
+					tripBookingList=new ArrayList<>();
 				tripBookingList.add(bookedTrip);
 				driver.setTripBookingList(tripBookingList);
 				driver.getCab().setAvailable(false);
+
 				driverRepository2.save(driver);
 
 				return bookedTrip;
@@ -75,7 +78,8 @@ public class CustomerServiceImpl implements CustomerService {
 		Driver driver=trip.getDriver();
 		driver.getCab().setAvailable(true);
 		List<TripBooking> customerTrips=customer.getTripBookingList();
-		customerTrips.remove(trip);
+		if(customerTrips!=null)
+			customerTrips.remove(trip);
 		customer.setTripBookingList(customerTrips);
 		List<TripBooking> driverTrips=driver.getTripBookingList();
 		driverTrips.remove(trip);
@@ -91,12 +95,16 @@ public class CustomerServiceImpl implements CustomerService {
 		trip.setStatus(TripStatus.COMPLETED);
 		Customer customer=trip.getCustomer();
 		List<TripBooking> customerTrips=customer.getTripBookingList();
+		if(customerTrips==null)
+			customerTrips=new ArrayList<>();
 		customerTrips.add(trip);
 		customer.setTripBookingList(customerTrips);
 		customerRepository2.save(customer);
 		Driver driver=trip.getDriver();
 		driver.getCab().setAvailable(true);
 		List<TripBooking> driverTrips=driver.getTripBookingList();
+		if(driverTrips==null)
+			driverTrips=new ArrayList<>();
 		driverTrips.add(trip);
 		driver.setTripBookingList(driverTrips);
 		driverRepository2.save(driver);

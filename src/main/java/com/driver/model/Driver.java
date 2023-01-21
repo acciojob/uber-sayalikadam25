@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class Driver implements Serializable {
+public class Driver{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int driverId;

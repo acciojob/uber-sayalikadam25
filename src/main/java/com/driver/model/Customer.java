@@ -8,7 +8,7 @@ public class Customer{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int customerId;
-
+    private String username;
     private String mobile;
     private String password;
 
@@ -16,6 +16,14 @@ public class Customer{
     List<TripBooking> tripBookingList;
     public Customer(){
 
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Customer(String mobile, String password) {

@@ -9,7 +9,7 @@ import javax.persistence.Id;
 public class Admin{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private int adminId;
 
     private String userName;
     private String password;
@@ -23,12 +23,12 @@ public class Admin{
         this.password = password;
     }
 
-    public int getId() {
-        return id;
+    public int getAdminId() {
+        return adminId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setAdminId(int id) {
+        this.adminId = id;
     }
 
     public String getUserName() {

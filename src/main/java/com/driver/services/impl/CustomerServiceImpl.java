@@ -1,16 +1,14 @@
 package com.driver.services.impl;
 
-import com.driver.model.TripBooking;
+import com.driver.model.*;
+import com.driver.repository.CabRepository;
 import com.driver.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.driver.model.Customer;
-import com.driver.model.Driver;
 import com.driver.repository.CustomerRepository;
 import com.driver.repository.DriverRepository;
 import com.driver.repository.TripBookingRepository;
-import com.driver.model.TripStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +25,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	TripBookingRepository tripBookingRepository2;
+	@Autowired
+	CabRepository cabRepository;
 
 	@Override
 	public void register(Customer customer) {
@@ -54,14 +54,21 @@ public class CustomerServiceImpl implements CustomerService {
 				bookedTrip.setDriver(driver);
 				bookedTrip.setStatus(TripStatus.CONFIRMED);
 				tripBookingRepository2.save(bookedTrip);
-				List<TripBooking> tripBookingList=driver.getTripBookingList();
-				if(tripBookingList==null)
-					tripBookingList=new ArrayList<>();
-				tripBookingList.add(bookedTrip);
-				driver.setTripBookingList(tripBookingList);
-				driver.getCab().setAvailable(false);
-
+				List<TripBooking> driverTrips=driver.getTripBookingList();
+				if(driverTrips==null)
+					driverTrips=new ArrayList<>();
+				driverTrips.add(bookedTrip);
+				driver.setTripBookingList(driverTrips);
+				Cab cab=driver.getCab();
+				cab.setAvailable(false);
+				cabRepository.save(cab);
 				driverRepository2.save(driver);
+				List<TripBooking> customerTrips=customer.getTripBookingList();
+				if(customerTrips==null)
+					customerTrips=new ArrayList<>();
+				customerTrips.add(bookedTrip);
+				customer.setTripBookingList(customerTrips);
+				customerRepository2.save(customer);
 
 				return bookedTrip;
 			}
@@ -74,16 +81,18 @@ public class CustomerServiceImpl implements CustomerService {
 		//Cancel the trip having given trip Id and update TripBooking attributes accordingly
 		TripBooking trip=tripBookingRepository2.findById(tripId).get();
 		trip.setStatus(TripStatus.CANCELED);
-		Customer customer=trip.getCustomer();
 		Driver driver=trip.getDriver();
-		driver.getCab().setAvailable(true);
-		List<TripBooking> customerTrips=customer.getTripBookingList();
-		if(customerTrips!=null)
-			customerTrips.remove(trip);
-		customer.setTripBookingList(customerTrips);
-		List<TripBooking> driverTrips=driver.getTripBookingList();
-		driverTrips.remove(trip);
-		driver.setTripBookingList(driverTrips);
+		Cab cab=driver.getCab();
+		cab.setAvailable(true);
+//		List<TripBooking> customerTrips=customer.getTripBookingList();
+//		if(customerTrips!=null)
+//			customerTrips.remove(trip);
+//		customer.setTripBookingList(customerTrips);
+//		List<TripBooking> driverTrips=driver.getTripBookingList();
+//		if(driverTrips!=null)
+//			driverTrips.remove(trip);
+//		driver.setTripBookingList(driverTrips);
+		cabRepository.save(cab);
 		driverRepository2.save(driver);
 		tripBookingRepository2.save(trip);
 	}
@@ -93,20 +102,10 @@ public class CustomerServiceImpl implements CustomerService {
 		//Complete the trip having given trip Id and update TripBooking attributes accordingly
 		TripBooking trip=tripBookingRepository2.findById(tripId).get();
 		trip.setStatus(TripStatus.COMPLETED);
-		Customer customer=trip.getCustomer();
-		List<TripBooking> customerTrips=customer.getTripBookingList();
-		if(customerTrips==null)
-			customerTrips=new ArrayList<>();
-		customerTrips.add(trip);
-		customer.setTripBookingList(customerTrips);
-		customerRepository2.save(customer);
 		Driver driver=trip.getDriver();
-		driver.getCab().setAvailable(true);
-		List<TripBooking> driverTrips=driver.getTripBookingList();
-		if(driverTrips==null)
-			driverTrips=new ArrayList<>();
-		driverTrips.add(trip);
-		driver.setTripBookingList(driverTrips);
+		Cab cab=driver.getCab();
+		cab.setAvailable(true);
+		cabRepository.save(cab);
 		driverRepository2.save(driver);
 		tripBookingRepository2.save(trip);
 	}

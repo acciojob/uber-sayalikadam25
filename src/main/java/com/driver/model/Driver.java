@@ -1,10 +1,11 @@
 package com.driver.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class Driver{
+public class Driver implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int driverId;

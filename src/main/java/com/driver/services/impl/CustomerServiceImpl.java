@@ -46,7 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
 		//Book the driver with lowest driverId who is free (cab available variable is Boolean.TRUE). If no driver is available, throw "No cab available!" exception
 		//Avoid using SQL query
 		Customer customer=customerRepository2.findById(customerId).get();
-		List<Driver> driverList=driverRepository2.findAllByOrderByDriverIdAsc();
+		List<Driver> driverList=driverRepository2.findAll();
 		for(Driver driver:driverList){
 			if(driver.getCab().getAvailable()){
 				TripBooking bookedTrip=new TripBooking(fromLocation,toLocation,distanceInKm);

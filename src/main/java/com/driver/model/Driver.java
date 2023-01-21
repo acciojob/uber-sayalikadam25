@@ -13,7 +13,7 @@ public class Driver{
     private String password;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="Id")
+    @JoinColumn(name="cab_id")
     private Cab cab;
 
     @OneToMany(mappedBy = "driver")

@@ -45,33 +45,33 @@ public class CustomerServiceImpl implements CustomerService {
 	public TripBooking bookTrip(int customerId, String fromLocation, String toLocation, int distanceInKm) throws Exception{
 		//Book the driver with lowest driverId who is free (cab available variable is Boolean.TRUE). If no driver is available, throw "No cab available!" exception
 		//Avoid using SQL query
-		Customer customer=customerRepository2.findById(customerId).get();
 		List<Driver> driverList=driverRepository2.findAll();
+		Customer customer = customerRepository2.findById(customerId).get();
+		int min=Integer.MAX_VALUE;
 		for(Driver driver:driverList){
-			if(driver.getCab().getAvailable()){
-				TripBooking bookedTrip=new TripBooking(fromLocation,toLocation,distanceInKm);
+			if(driver.getCab().getAvailable() && driver.getDriverId()<min){
+				TripBooking bookedTrip = new TripBooking();
+				int bill = driver.getCab().getPerKmRate() * distanceInKm;
+
 				bookedTrip.setCustomer(customer);
 				bookedTrip.setDriver(driver);
+				bookedTrip.setFromLocation(fromLocation);
+				bookedTrip.setToLocation(toLocation);
+				bookedTrip.setDistanceInKm(distanceInKm);
+				bookedTrip.setBill(bill);
 				bookedTrip.setStatus(TripStatus.CONFIRMED);
-				tripBookingRepository2.save(bookedTrip);
-				List<TripBooking> driverTrips=driver.getTripBookingList();
-				if(driverTrips==null)
-					driverTrips=new ArrayList<>();
-				driverTrips.add(bookedTrip);
-				driver.setTripBookingList(driverTrips);
-				Cab cab=driver.getCab();
-				cab.setAvailable(false);
-				driver.setCab(cab);
-				driverRepository2.save(driver);
-				List<TripBooking> customerTrips=customer.getTripBookingList();
-				if(customerTrips==null)
-					customerTrips=new ArrayList<>();
-				customerTrips.add(bookedTrip);
-				customer.setTripBookingList(customerTrips);
+
+				driver.getTripBookingList().add(bookedTrip);
+				driver.getCab().setAvailable(false);
+
+				customer.getTripBookingList().add(bookedTrip);
+
 				customerRepository2.save(customer);
+				driverRepository2.save(driver);
 
 				return bookedTrip;
 			}
+
 		}
 		throw new Exception("No cab available!");
 	}

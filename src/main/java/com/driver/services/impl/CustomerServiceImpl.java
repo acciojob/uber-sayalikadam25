@@ -48,14 +48,14 @@ public class CustomerServiceImpl implements CustomerService {
 		List<Driver> driverList=driverRepository2.findAll();
 		Customer customer = customerRepository2.findById(customerId).get();
 		int min=Integer.MAX_VALUE;
-		Driver driver1=null;
+		Driver driver1=new Driver();
 		for(Driver driver:driverList){
 			if(driver.getCab().getAvailable() && driver.getDriverId()<min){
 				min = driver.getDriverId();
 				driver1 = driver;
 			}
 		}
-		if(driver1!=null && min<Integer.MAX_VALUE){
+		if(min<Integer.MAX_VALUE){
 				TripBooking bookedTrip=new TripBooking(fromLocation,toLocation,distanceInKm);
 				int bill=driver1.getCab().getPerKmRate() * distanceInKm;
 				bookedTrip.setCustomer(customer);

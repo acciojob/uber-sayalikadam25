@@ -63,6 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
 				bookedTrip.setStatus(TripStatus.CONFIRMED);
 				bookedTrip.setBill(bill);
 				tripBookingRepository2.save(bookedTrip);
+
 				List<TripBooking> driverTrips=driver1.getTripBookingList();
 				if(driverTrips==null)
 					driverTrips=new ArrayList<>();
@@ -70,6 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
 				driver1.setTripBookingList(driverTrips);
 				driver1.getCab().setAvailable(false);
 				driverRepository2.save(driver1);
+
 				List<TripBooking> customerTrips=customer.getTripBookingList();
 				if(customerTrips==null)
 					customerTrips=new ArrayList<>();

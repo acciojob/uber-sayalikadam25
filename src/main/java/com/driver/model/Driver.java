@@ -2,6 +2,7 @@ package com.driver.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ public class Driver implements Serializable{
     private Cab cab;
 
     @OneToMany(mappedBy = "driver")
-    List<TripBooking> tripBookingList;
+    private List<TripBooking> tripBookingList=new ArrayList<>();
 
     public Driver(String mobile, String password) {
         this.mobile = mobile;

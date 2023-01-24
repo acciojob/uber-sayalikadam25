@@ -45,44 +45,84 @@ public class CustomerServiceImpl implements CustomerService {
 	public TripBooking bookTrip(int customerId, String fromLocation, String toLocation, int distanceInKm) throws Exception{
 		//Book the driver with lowest driverId who is free (cab available variable is Boolean.TRUE). If no driver is available, throw "No cab available!" exception
 		//Avoid using SQL query
-		List<Driver> driverList=driverRepository2.findAll();
-		Customer customer = customerRepository2.findById(customerId).get();
-		int min=Integer.MAX_VALUE;
-		Driver driver1=new Driver();
-		for(Driver driver:driverList){
+		List<Driver> drivers = driverRepository2.findAll();
+		int min = Integer.MAX_VALUE;
+		Driver driver1 = null;
+
+		for(Driver driver:drivers){
 			if(driver.getCab().getAvailable() && driver.getDriverId()<min){
 				min = driver.getDriverId();
 				driver1 = driver;
 			}
 		}
-		if(min<Integer.MAX_VALUE){
-				TripBooking bookedTrip=new TripBooking(fromLocation,toLocation,distanceInKm);
-				int bill=driver1.getCab().getPerKmRate() * distanceInKm;
-				bookedTrip.setCustomer(customer);
-				bookedTrip.setDriver(driver1);
-				bookedTrip.setStatus(TripStatus.CONFIRMED);
-				bookedTrip.setBill(bill);
-				tripBookingRepository2.save(bookedTrip);
 
-				List<TripBooking> driverTrips=driver1.getTripBookingList();
-				if(driverTrips==null)
-					driverTrips=new ArrayList<>();
-				driverTrips.add(bookedTrip);
-				driver1.setTripBookingList(driverTrips);
-				driver1.getCab().setAvailable(false);
-				driverRepository2.save(driver1);
+		if(min < Integer.MAX_VALUE && driver1!=null){
+			Customer customer = customerRepository2.findById(customerId).get();
 
-				List<TripBooking> customerTrips=customer.getTripBookingList();
-				if(customerTrips==null)
-					customerTrips=new ArrayList<>();
-				customerTrips.add(bookedTrip);
-				customer.setTripBookingList(customerTrips);
-				customerRepository2.save(customer);
+			TripBooking tripBooking = new TripBooking();
+			int bill = driver1.getCab().getPerKmRate() * distanceInKm;
 
-				return bookedTrip;
+			tripBooking.setCustomer(customer);
+			tripBooking.setDriver(driver1);
+			tripBooking.setFromLocation(fromLocation);
+			tripBooking.setToLocation(toLocation);
+			tripBooking.setDistanceInKm(distanceInKm);
+			tripBooking.setBill(bill);
+			tripBooking.setStatus(TripStatus.CONFIRMED);
+
+			driver1.getTripBookingList().add(tripBooking);
+			driver1.getCab().setAvailable(false);
+
+			customer.getTripBookingList().add(tripBooking);
+
+			tripBookingRepository2.save(tripBooking);
+			customerRepository2.save(customer);
+			driverRepository2.save(driver1);
+
+			return tripBooking;
 		}
+		else
+			throw new Exception("No cab available!");
 
-		throw new Exception("No cab available!");
+
+//		List<Driver> driverList=driverRepository2.findAll();
+//		Customer customer = customerRepository2.findById(customerId).get();
+//		int min=Integer.MAX_VALUE;
+//		Driver driver1=new Driver();
+//		for(Driver driver:driverList){
+//			if(driver.getCab().getAvailable() && driver.getDriverId()<min){
+//				min = driver.getDriverId();
+//				driver1 = driver;
+//			}
+//		}
+//		if(min<Integer.MAX_VALUE){
+//				TripBooking bookedTrip=new TripBooking(fromLocation,toLocation,distanceInKm);
+//				int bill=driver1.getCab().getPerKmRate() * distanceInKm;
+//				bookedTrip.setCustomer(customer);
+//				bookedTrip.setDriver(driver1);
+//				bookedTrip.setStatus(TripStatus.CONFIRMED);
+//				bookedTrip.setBill(bill);
+//				tripBookingRepository2.save(bookedTrip);
+
+//				List<TripBooking> driverTrips=driver1.getTripBookingList();
+//				if(driverTrips==null)
+//					driverTrips=new ArrayList<>();
+//				driverTrips.add(bookedTrip);
+//				driver1.setTripBookingList(driverTrips);
+//				driver1.getCab().setAvailable(false);
+//				driverRepository2.save(driver1);
+//
+//				List<TripBooking> customerTrips=customer.getTripBookingList();
+//				if(customerTrips==null)
+//					customerTrips=new ArrayList<>();
+//				customerTrips.add(bookedTrip);
+//				customer.setTripBookingList(customerTrips);
+//				customerRepository2.save(customer);
+//
+//				return bookedTrip;
+//		}
+//
+//		throw new Exception("No cab available!");
 	}
 
 	@Override
